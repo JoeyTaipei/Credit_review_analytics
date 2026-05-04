@@ -1,0 +1,28 @@
+# Virtual environment — 絕對不要推
+.venv/
+venv/
+env/
+
+# Python compiled files
+__pycache__/
+*.pyc
+*.pyo
+
+# Generated outputs — reviewer 自己跑 pipeline 就會產生
+outputs/
+
+# OS files
+Thumbs.db
+desktop.ini
+.DS_Store
+
+# Cursor / VS Code settings (個人喜好，不推)
+.cursor/
+.vscode/
+
+# API keys — 萬一你之後把 key 寫在本地檔案
+.env
+*.env
+
+# Zip 包
+*.zip
