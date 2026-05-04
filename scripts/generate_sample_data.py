@@ -160,6 +160,49 @@ COMPANIES = {
         "inventory_days_mean": 15,
         "interest_coverage_mean": 80,
     },
+    # STRESS SCENARIOS
+    "9901": {
+        "name": "合纖工業[模擬]",
+        "industry": "traditional_manufacturing",
+        "industry_zh": "傳統製造",
+        "broad_industry": "manufacturing",
+        "broad_industry_zh": "製造業",
+        "is_financial": False,
+        "revenue_2020": 38,
+        "revenue_cagr": -0.03,
+        "gross_margin_mean": 0.12,
+        "op_margin_mean": 0.025,
+        "net_margin_mean": 0.010,
+        "asset_turnover": 0.90,
+        "debt_ratio_mean": 0.72,
+        "current_ratio_mean": 1.05,
+        "quick_ratio_mean": 0.70,
+        "ar_days_mean": 95,
+        "inventory_days_mean": 110,
+        "interest_coverage_mean": 3.2,
+    },
+    "9902": {
+        "name": "展騰餐飲[模擬]",
+        "industry": "food_service",
+        "industry_zh": "連鎖餐飲",
+        "broad_industry": "services",
+        "broad_industry_zh": "服務業",
+        "is_financial": False,
+        # 高風險 scenario — 關鍵是 asset_turnover 低（空置店面）
+        # 使 Altman Z X5 偏小，Z' < 1.0 → 破產警示區
+        "revenue_2020": 22,
+        "revenue_cagr": -0.08,
+        "gross_margin_mean": 0.18,
+        "op_margin_mean": 0.005,
+        "net_margin_mean": -0.012,
+        "asset_turnover": 0.62,
+        "debt_ratio_mean": 0.84,
+        "current_ratio_mean": 0.65,
+        "quick_ratio_mean": 0.35,
+        "ar_days_mean": 20,
+        "inventory_days_mean": 30,
+        "interest_coverage_mean": 1.3,
+    },
 }
 
 YEARS = [2020, 2021, 2022, 2023, 2024]
@@ -187,6 +230,9 @@ def _build_non_financial(ticker: str, profile: dict) -> list[dict]:
             growth = -0.05            # simulate a soft year for Delta
         if ticker == "2317" and year == 2023:
             growth = -0.07            # Hon Hai 2023 dip
+        # Stress companies: accelerating decline each year
+        if ticker == "9902" and year >= 2022:
+            growth = -0.15            # 餐飲加速衰退
         revenue = revenue_prev * (1 + growth) if i > 0 else profile["revenue_2020"]
         revenue_prev = revenue
 
