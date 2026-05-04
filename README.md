@@ -1,18 +1,18 @@
 # 企業授信覆審分析工具
-**Corporate Credit Review Analytics Tool — Deloitte FSI Demo**
+**Corporate Credit Review Analytics Tool — FSI Demo**
 
 > Internal demo for partner review. Simplified version of the "Risk Intelligence Dashboard" service offering, built to support the credit review analyst workflow at a mid-size Taiwan commercial bank.
 
 ---
 
-## 1. 專案目的 (Why this exists)
+## 1. 專案目的 
 
 台灣中型商業銀行的核貸專員，每年要對既有企業授信戶做覆審。目前流程：
 人工從年報、信用查詢、產業報告蒐集資料 → Excel 算財務比率 → 寫覆審意見 → 平均**4-6 小時/戶**，且不同分行品質差異大。
 
 **這個工具的目標**：把「資料整理 + 比率計算 + 異常偵測 + 初稿撰寫」自動化，將前置分析縮短到 **30 分鐘以內**，讓核貸專員把時間花在「判斷」而非「整理」。
 
-> 我們刻意**不**把它做成完整 production system —— 這是 demo，不是要取代核心系統。決策權永遠在持照核貸主管手上。
+> 刻意**不**把它做成完整 production system —— 這是 demo，不是要取代核心系統。決策權永遠在持照核貸主管手上。
 
 ---
 
@@ -20,7 +20,7 @@
 
 ```
 credit_review_tool/
-├── README.md                          ← 你正在讀的這個
+├── README.md                          ← 正在讀的這個
 ├── requirements.txt                   ← Python 依賴
 ├── src/                               ← 核心程式碼
 │   ├── data_pipeline.py               ← 從 FinMind / TWSE OpenAPI 抓資料
