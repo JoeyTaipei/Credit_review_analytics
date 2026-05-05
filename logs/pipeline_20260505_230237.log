@@ -1,0 +1,31 @@
+23:02:37 [INFO] ============================================================
+23:02:37 [INFO] 🏦 Credit Review Full Pipeline
+23:02:37 [INFO]    時間:2026-05-05 23:02:37
+23:02:37 [INFO]    輸出目錄:C:\Users\User\Desktop\授信複審ai_agent\credit_review_tool\outputs
+23:02:37 [INFO] ============================================================
+23:02:37 [INFO] ▶️  執行 Generate Sample Data:scripts\generate_sample_data.py
+23:02:38 [INFO] ✅ Generate Sample Data 完成(0.6s)
+23:02:38 [WARNING] ⏭️  略過 Data Pipeline / Schema Validation:找不到 data_pipeline.py(可選)
+23:02:38 [INFO] 📦 ratios_wide.csv 已存在,但仍重新執行 Financial Ratios(確保資料一致)
+23:02:38 [INFO] ▶️  執行 Financial Ratios:src\financial_ratios.py
+23:02:39 [INFO] ✅ Financial Ratios 完成(0.7s)
+23:02:39 [INFO] ▶️  執行 Feature Engineering:src\feature_engineering.py
+23:02:39 [INFO] ✅ Feature Engineering 完成(0.6s)
+23:02:39 [INFO] 📦 anomalies.csv 已存在,但仍重新執行 Anomaly Detection(確保資料一致)
+23:02:39 [INFO] ▶️  執行 Anomaly Detection:src\anomaly_detection.py
+23:02:40 [INFO] ✅ Anomaly Detection 完成(0.7s)
+23:02:40 [INFO] 📦 risk_flags.csv 已存在,但仍重新執行 Risk Flags & Scoring(確保資料一致)
+23:02:40 [INFO] ▶️  執行 Risk Flags & Scoring:src\risk_flags.py
+23:02:41 [INFO] ✅ Risk Flags & Scoring 完成(0.7s)
+23:02:41 [INFO] ▶️  Build dashboard_credit_review.csv
+23:02:41 [INFO]    主表 risk_flags:45 筆
+23:02:41 [INFO]    合併 ratios_wide ✓
+23:02:41 [INFO]    合併 anomalies ✓
+23:02:41 [INFO] credit_actions 完成:117 筆 | {'low': 84, 'medium': 19, 'high': 14}
+23:02:41 [INFO]    附加 credit_actions ✓
+23:02:41 [INFO] ✅ Build dashboard_credit_review.csv 完成 → dashboard_credit_review.csv(117 筆,0.0s)
+23:02:41 [INFO] ▶️  執行 Executive Summary:scripts\generate_executive_summary.py
+23:02:41 [INFO] ✅ Executive Summary 完成(0.7s)
+23:02:41 [INFO] ▶️  執行 Case Study:scripts\generate_case_study.py
+23:02:42 [INFO] ✅ Case Study 完成(0.6s)
+23:02:42 [INFO] ⏭️  PostgreSQL Write:--skip-db 模式

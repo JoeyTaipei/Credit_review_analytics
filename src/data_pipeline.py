@@ -49,6 +49,7 @@ CANONICAL_COLUMNS = [
     "cash_and_equivalents", "accounts_receivable", "inventory",
     "retained_earnings", "market_value_equity",
     "operating_cash_flow",
+    "credit_exposure", "credit_limit", "internal_rating", "utilisation_rate",
 ]
 
 

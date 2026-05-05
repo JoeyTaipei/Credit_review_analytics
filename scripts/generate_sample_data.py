@@ -49,6 +49,9 @@ COMPANIES = {
         "ar_days_mean": 45,
         "inventory_days_mean": 90,
         "interest_coverage_mean": 95,
+        "credit_exposure_mean": 85,    # 億元，台積電信用好曝險大
+        "credit_limit_mean": 100,
+        "internal_rating_mean": 1.5,   # 1 最好，10 最差
     },
     "2317": {
         "name": "鴻海",

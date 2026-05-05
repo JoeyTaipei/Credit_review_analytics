@@ -103,6 +103,18 @@ def detect_anomalies_zscore(
     ).dropna(subset=["value"])
 
     # Leave-one-out mean/std per (ticker, signal)
+    # 這段程式碼是計算 leave-one-out（略去本身年度值）的 Z-score：
+    # 
+    # 在每家公司的每一個監控信號（如營收成長率）下，對其每一年觀測值 x_i：
+    #    1. 先把這個值「移除」，以其餘年度作為參考母體，計算均值與標準差
+    #    2. 用公式 z_i = (x_i - mean_{j≠i}) / std_{j≠i} 算出 Z 分數
+    # 
+    # 為什麼要做 leave-one-out？
+    # - 因為小樣本下（例：僅 4~5 年），有極端值時，若把自己也算進母體，
+    #   會低估異常，讓標準差被拉大，使任何一年的 z-score 都偏小，幾乎不可能被標註為異常
+    # - leave-one-out 從統計上避免這個問題，也更符合覆審官「先看全部，檢查本年是否異常」的判斷方式
+    # 
+    # 具體來說，_loo_z 會跑在 groupby() 之後，每組（公司、信號）以 pd.Series 算每年 LOO z-score。
     def _loo_z(group: pd.Series) -> pd.Series:
         n = len(group)
         if n < 3:
