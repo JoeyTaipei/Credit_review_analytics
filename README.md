@@ -1,130 +1,350 @@
-# 企業授信覆審分析工具
-**Corporate Credit Review Analytics Tool — FSI Demo**
+# 🏦 年度授信覆審 AI 分析工具
+### AI 輔助 Portfolio Risk Analysis｜Deloitte Data Analyst Intern Demo
 
-> Internal demo for partner review. Simplified version of the "Risk Intelligence Dashboard" service offering, built to support the credit review analyst workflow at a mid-size Taiwan commercial bank.
-
----
-
-## 1. 專案目的 
-
-台灣中型商業銀行的核貸專員，每年要對既有企業授信戶做覆審。目前流程：
-人工從年報、信用查詢、產業報告蒐集資料 → Excel 算財務比率 → 寫覆審意見 → 平均**4-6 小時/戶**，且不同分行品質差異大。
-
-**這個工具的目標**：把「資料整理 + 比率計算 + 異常偵測 + 初稿撰寫」自動化，將前置分析縮短到 **30 分鐘以內**，讓核貸專員把時間花在「判斷」而非「整理」。
-
-> 刻意**不**把它做成完整 production system —— 這是 demo，不是要取代核心系統。決策權永遠在持照核貸主管手上。
+[![Python 3.11](https://img.shields.io/badge/Python-3.11-blue)](https://www.python.org/)
+[![PostgreSQL](https://img.shields.io/badge/Database-PostgreSQL-336791)](https://www.postgresql.org/)
+[![Tableau](https://img.shields.io/badge/Visualization-Tableau-E97627)](https://www.tableau.com/)
+[![Status](https://img.shields.io/badge/Status-Demo%20Ready-green)]()
 
 ---
 
-## 2. 資料夾結構
+## 📌 專案簡介
 
-```
+本專案是一個 **AI 輔助的年度授信覆審分析工具**，模擬金融機構在企業授信覆審流程中，如何透過資料分析、風險評分與視覺化儀表板，協助授信人員更快識別高風險公司與產業集中風險。
+
+系統會使用多年度企業財務資料，計算財務比率、偵測異常變化、建立風險分數，並輸出可供 Tableau 使用的 dashboard 資料與一頁式覆審摘要。
+
+> **重要聲明：**  
+> 本專案使用 100% 模擬資料，僅作為作品集展示用途。  
+> 這不是自動核貸系統，也不會取代人工授信判斷。  
+> AI 的角色是協助整理資料、提示風險與產生建議，最終決策仍需由授信人員或主管覆核。
+
+---
+
+## 🎯 商業問題
+
+金融機構在年度授信覆審時，常面臨以下痛點：
+
+- 企業財務資料量大，人工整理耗時
+- 不同授信人員的風險判斷標準可能不一致
+- 財務惡化或異常變化不容易即時被發現
+- 產業集中風險難以用直覺方式呈現
+- 主管需要快速掌握 portfolio 層級的風險概況
+
+本專案的目標是建立一個 **data-driven credit review workflow**，協助分析師快速完成：
+
+1. 財務資料整理  
+2. 財務比率計算  
+3. 風險旗標標記  
+4. 異常偵測  
+5. Tableau 視覺化  
+6. 覆審建議與摘要輸出  
+
+---
+
+## 💡 解決方案
+
+| 分析層級 | 功能 | 使用技術 |
+|---|---|---|
+| 資料產生 | 建立 9 家公司 × 5 年模擬財務資料 | Python / Pandas |
+| 資料處理 | 清理資料、轉換格式、建立 Tableau 輸出 | Python / Pandas |
+| 財務比率 | 負債比、流動比、利息保障倍數、ROA、ROE、Altman Z' | Python / NumPy |
+| 風險旗標 | 高負債、低流動性、低利息保障、營收衰退等 | Python |
+| 異常偵測 | 比較公司歷年財務變化，找出異常波動 | Python |
+| 建議行動 | 根據風險等級產生授信覆審建議 | Python |
+| 報告輸出 | 產出 executive summary 與 case study | CSV / Markdown |
+| 視覺化 | 建立互動式風險儀表板 | Tableau |
+| 資料庫 | 支援 PostgreSQL / Docker，但 demo 可使用 CSV | PostgreSQL / Docker |
+
+---
+
+## 🏗️ 專案架構
+
+```text
 credit_review_tool/
-├── README.md                          ← 正在讀的這個
-├── requirements.txt                   ← Python 依賴
-├── src/                               ← 核心程式碼
-│   ├── data_pipeline.py               ← 從 FinMind / TWSE OpenAPI 抓資料
-│   ├── financial_ratios.py            ← 8+ 個財務比率 + Altman Z'
-│   ├── anomaly_detection.py           ← Z-score 異常偵測
-│   └── llm_summary.py                 ← LLM 覆審意見生成
 ├── scripts/
-│   ├── generate_sample_data.py        ← 產生模擬資料（demo 用）
-│   └── run_full_pipeline.py           ← 一鍵跑完整流程
-├── data/
-│   ├── sample_financials_long.csv     ← 模擬資料（long format）
-│   └── sample_industry_medians.csv    ← 產業中位數對標
+│   ├── generate_sample_data.py          # 產生模擬財務資料
+│   ├── run_full_pipeline.py             # 一鍵執行完整 pipeline
+│   ├── generate_executive_summary.py    # 產出主管摘要
+│   └── generate_case_study.py           # 產出一頁式個案報告
+│
+├── src/
+│   ├── financial_ratios.py              # 財務比率計算
+│   ├── feature_engineering.py           # 特徵工程
+│   ├── anomaly_detection.py             # 異常偵測
+│   ├── risk_flags.py                    # 風險旗標與風險分數
+│   ├── credit_actions.py                # 授信建議行動
+│   └── agent_trace.py                   # AI 建議與人工覆核紀錄
+│
 ├── outputs/
-│   ├── ratios_long.csv                ← 給 Tableau 的主表
-│   ├── anomalies.csv                  ← 異常偵測結果
-│   ├── sample_llm_input.json          ← LLM prompt 輸入範例
-│   └── sample_llm_output.md           ← LLM 輸出範例
+│   ├── dashboard_credit_review.csv      # Tableau 主要資料來源
+│   ├── executive_summary.csv            # Portfolio 摘要
+│   ├── case_study.md                    # 高風險公司個案報告
+│   └── other CSV outputs
+│
 ├── docs/
-│   ├── executive_summary.md           ← 一頁式 SVP 摘要
-│   ├── tableau_dashboard_spec.md      ← 三頁 dashboard 設計規格
-│   ├── tableau_learning_roadmap.md    ← Tableau 學習計畫
-│   ├── methodology_and_defense.md     ← 每個技術選擇的 defense
-│   └── interview_qa.md                ← 預期 Q&A 演練
-└── notebooks/
-    └── exploratory_analysis.ipynb     ← 探索性分析（選做）
+│   ├── day_1_technical.md
+│   ├── day_2_technical.md
+│   ├── day_3_technical.md
+│   └── sql_showcase.sql
+│
+├── docker-compose.yml                   # PostgreSQL 環境設定
+├── requirements.txt
+└── README.md
 ```
 
 ---
 
-## 3. 快速開始 (Quick Start)
+## 🔄 分析流程
+
+```text
+模擬財務資料
+        ↓
+資料清理與轉換
+        ↓
+財務比率計算
+        ↓
+風險旗標與異常偵測
+        ↓
+綜合風險分數
+        ↓
+建議授信行動
+        ↓
+CSV / PostgreSQL / Markdown 輸出
+        ↓
+Tableau 互動式儀表板
+```
+
+---
+
+## 📊 Tableau Dashboard 設計
+
+本專案使用 `outputs/dashboard_credit_review.csv` 作為 Tableau 主要資料來源。
+
+目前 dashboard 設計重點：
+
+### 1. 企業風險分數排名
+
+用途：快速辨識 2024 年風險最高的公司。
+
+可回答問題：
+
+- 哪些公司需要優先覆審？
+- 哪些公司風險分數最高？
+- 哪些公司屬於 High / Critical risk？
+
+---
+
+### 2. 產業授信風險分布
+
+用途：觀察風險是否集中在特定產業。
+
+可回答問題：
+
+- 哪些產業風險較高？
+- 高風險公司是否集中在少數產業？
+- Portfolio 是否有產業集中風險？
+
+---
+
+### 3. 企業 5 年風險趨勢
+
+用途：追蹤公司風險是否持續惡化或改善。
+
+可回答問題：
+
+- 哪些公司風險逐年上升？
+- 哪些公司在 2024 年突然惡化？
+- 風險變化是否具有趨勢性？
+
+---
+
+## 🖱️ Tableau 互動功能建議
+
+為了讓 dashboard 更像顧問交付成果，建議加入以下互動功能：
+
+| 互動功能 | 做法 | 商業價值 |
+|---|---|---|
+| 年度篩選器 | 加入 `Year` filter | 讓使用者切換不同覆審年度 |
+| 產業篩選器 | 加入 `Industry` filter | 快速查看特定產業風險 |
+| 風險等級篩選器 | 加入 `Risk Band` / `Risk Level` filter | 聚焦 High / Critical 公司 |
+| 點擊泡泡圖聯動 | Dashboard Action → Filter | 點選產業後，自動更新公司排名與趨勢圖 |
+| Tooltip 說明 | 在 tooltip 加入 `suggested_action`、`review_reason` | 點到公司即可看到授信建議 |
+| Highlight Action | 滑鼠移到公司名稱時 highlight 該公司趨勢 | 方便追蹤單一公司 |
+| Parameter 控制指標 | 建立指標切換參數，例如 Risk Score / Debt Ratio / Altman Z' | 讓 dashboard 更有互動分析感 |
+
+---
+
+## 📐 風險評分邏輯
+
+### Step 1：財務比率計算
+
+| 指標 | 公式 | 解讀 |
+|---|---|---|
+| Debt Ratio | Total Liabilities / Total Assets | 衡量槓桿程度 |
+| Interest Coverage | EBIT / Interest Expense | 衡量償債能力 |
+| Current Ratio | Current Assets / Current Liabilities | 衡量短期流動性 |
+| ROA | Net Income / Total Assets | 衡量資產獲利能力 |
+| ROE | Net Income / Equity | 衡量股東權益報酬 |
+| Altman Z' | 非上市企業破產風險指標 | 越低代表財務壓力越高 |
+
+---
+
+### Step 2：Rule-Based Risk Flags
+
+系統會針對每家公司每一年建立風險旗標，例如：
+
+- `flag_high_debt`：負債比過高
+- `flag_low_coverage`：利息保障倍數過低
+- `flag_low_liquidity`：流動比率過低
+- `flag_negative_profit`：淨利為負
+- `flag_revenue_decline`：營收明顯衰退
+- `flag_altman_distress`：Altman Z' 低於安全門檻
+
+---
+
+### Step 3：綜合風險分數
+
+```text
+Combined Risk Score = Rule-Based Risk Score × 60% + Anomaly Score × 40%
+```
+
+目前 60/40 權重是 demo 用的 heuristic 設定。
+
+在真實 production 專案中，權重應該使用歷史違約資料進行校準，例如 logistic regression、XGBoost 或其他 credit risk model。
+
+---
+
+## 🤖 Human-in-the-Loop 設計
+
+本專案的核心原則是：
+
+```text
+AI 提供分析與建議，人類負責最終決策。
+```
+
+AI 可以協助：
+
+- 快速整理財務指標
+- 找出異常公司
+- 產生風險摘要
+- 提出授信覆審建議
+
+但 AI 不應該直接決定：
+
+- 是否核准授信
+- 是否拒絕續貸
+- 是否調整額度
+- 是否要求擔保品
+
+這樣的設計較符合金融業對模型治理、人工覆核與風險控管的要求。
+
+---
+
+## 📁 主要輸出檔案
+
+| 檔案 | 用途 |
+|---|---|
+| `outputs/dashboard_credit_review.csv` | Tableau dashboard 主要資料來源 |
+| `outputs/executive_summary.csv` | Portfolio 層級摘要 |
+| `outputs/case_study.md` | 高風險公司一頁式個案報告 |
+| `outputs/ratios_wide.csv` | 財務比率寬表 |
+| `outputs/anomalies.csv` | 異常偵測結果 |
+| `outputs/risk_flags.csv` | 風險旗標結果 |
+| `logs/*.log` | Pipeline 執行紀錄 |
+
+---
+
+## ⚠️ 限制
+
+| 限制 | 影響 | 未來改進方向 |
+|---|---|---|
+| 使用模擬資料 | 無法驗證真實違約預測能力 | 接入真實授信資料 |
+| 沒有 default labels | 無法計算 AUC / KS / Gini | 使用歷史違約資料回測 |
+| 權重為 heuristic | 不是正式模型校準結果 | 用 logistic regression 或 XGBoost 校準 |
+| 未加入總體經濟變數 | 無法反映利率與景氣循環 | 加入 GDP、利率、產業景氣資料 |
+| Tableau 主要使用 CSV | 即時資料更新能力有限 | 未來可接 PostgreSQL / data warehouse |
+| 無 NLP 文件分析 | 未分析年報文字或新聞 | 未來可加入 LLM-based credit memo analysis |
+
+---
+
+## 🚀 未來優化方向
+
+1. **接入真實資料來源**  
+   將 synthetic data 改為真實授信資料或公開財報資料。
+
+2. **模型校準與驗證**  
+   使用歷史違約標籤校準風險分數，並加入 AUC、KS、Gini 等驗證指標。
+
+3. **加入總體經濟變數**  
+   例如利率、GDP 成長率、產業景氣指標。
+
+4. **升級資料流程**  
+   將 Python script 升級為 Airflow / dbt pipeline。
+
+5. **強化 Tableau 互動功能**  
+   加入 dashboard actions、filter、tooltip、parameter，讓使用者可以自行探索公司、產業與年度風險。
+
+6. **加入 LLM 報告生成**  
+   根據風險分數、異常原因與建議行動，自動產生授信覆審 memo 初稿。
+
+---
+
+## 🛠️ Setup & Quickstart
 
 ```bash
-# 1. 安裝依賴
+# 1. Clone repository
+git clone https://github.com/JoeyTaipei/Credit_review_analytics.git
+cd Credit_review_analytics
+
+# 2. Install packages
 pip install -r requirements.txt
 
-# 2. 產生模擬資料（不需要 API key，立即可用）
-python scripts/generate_sample_data.py
+# 3. Run full pipeline without database
+python scripts/run_full_pipeline.py --skip-db
 
-# 3. 跑完整 pipeline
+# 4. Optional: start PostgreSQL with Docker
+docker-compose up -d
+
+# 5. Optional: run full pipeline with database
 python scripts/run_full_pipeline.py
-
-# 4. 輸出檔案會出現在 outputs/，把 ratios_long.csv 匯入 Tableau
 ```
 
-如果要用真實資料，請參考 `src/data_pipeline.py` 裡 `fetch_from_finmind()` 函式並填入 token。
+---
+
+## 🧪 Demo Workflow
+
+建議面試展示順序：
+
+```text
+1. 開 GitHub README，說明商業問題與系統架構
+2. 簡短展示 Python pipeline
+3. 執行 python scripts/run_full_pipeline.py --skip-db
+4. 打開 outputs/dashboard_credit_review.csv
+5. 展示 Tableau dashboard
+6. 說明 AI-assisted，不是 automated loan approval
+7. 說明限制與 production improvement
+```
 
 ---
 
-## 4. 樣本公司組合 (Sample Portfolio)
+## 👤 Author
 
-刻意挑選跨產業，呈現比較分析能力：
+Built by Joey as a portfolio project for data analyst / analytics consulting internship applications.
 
-| 股票代號 | 公司 | 產業 | 為何選擇 |
-|---|---|---|---|
-| 2330 | 台積電 | 半導體製造 | 高毛利、低槓桿，標竿案例 |
-| 2317 | 鴻海 | 電子代工 | 低毛利、高週轉，OEM 典型 |
-| 2308 | 台達電 | 電子零組件 | 毛利轉型中，觀察重點 |
-| 2882 | 國泰金 | 金融控股 | 金融業（部分比率 N/A，獨立處理）|
-| 2891 | 中信金 | 金融控股 | 同上，與國泰金做同業比較 |
-| 2912 | 統一超 | 零售服務 | 高週轉、低毛利的服務業樣本 |
-| 2412 | 中華電 | 電信服務 | 公用事業特性，現金流穩定 |
+此專案用於展示：
 
-> ⚠️ **重要**：本 demo 使用**模擬資料**進行示範，數字僅為教學用途，不代表上述公司的實際財務數據。實際導入時請以 MOPS / 經會計師簽證之年報為準。
+- Python 資料處理能力
+- 財務風險分析邏輯
+- Tableau 視覺化能力
+- End-to-end data pipeline thinking
+- AI-assisted decision support 設計概念
+- 技術結果轉換成商業語言的能力
 
 ---
 
-## 5. 為什麼這樣設計？(Key Design Choices)
+## 📌 One-Sentence Summary
 
-| 問題 | 我的選擇 | 為什麼 |
-|---|---|---|
-| 資料來源 | FinMind + TWSE OpenAPI（demo 用模擬資料）| MOPS 直接爬蟲需 session 管理且不穩定；FinMind 是台灣 fintech 社群最常用的免費 API；正式上線時應改接 MOPS 公開 API + 銀行內部信用查詢系統 |
-| 資料格式 | Long format | Tableau 對 long format 最友好；新增比率不需改 schema |
-| 異常偵測模型 | Z-score（不是 Isolation Forest）| 樣本只有 7 家 × 5 年 = 35 列，sample size 不足以撐起 Isolation Forest；Z-score 結果可解釋（「這年數值偏離過去 5 年平均 2.5 個標準差」），核貸專員看得懂 |
-| Altman Z 版本 | 用 Z'（私人公司版）| 雖然樣本是上市公司，但 Z' 對台灣製造業擬合較好（學界共識）；金融業不適用，明確標 N/A |
-| LLM 角色 | 只做「初稿撰寫」，不做判斷 | 強制 prompt 引用儀表板數字、結尾掛人工覆核免責；防止 hallucination 是 banking 場景的硬要求 |
-| Dashboard 工具 | Tableau Public | 客戶資安考量：Public 版不能傳機敏資料，但 demo 階段可分享連結；正式版需 Tableau Server 或 Power BI 內網部署 |
-
-更詳細的 defense 見 `docs/methodology_and_defense.md`。
-
----
-
-## 6. 已知限制 (What this tool is NOT)
-
-- **不處理金融業核心比率**：銀行/保險業的資產負債結構不同，存貨/應收帳款週轉率不適用。本工具對 2882、2891 只計算 ROE、ROA，其餘標 N/A。正式版需另建金融業專用模型（NPL ratio、CAR、淨利差等）。
-- **不做集團合併分析**：例如鴻海集團有眾多子公司，本工具只看母公司年報，未做合併調整。
-- **不接信用查詢資料**：聯徵中心、跳票紀錄、銀行內部信用評等等都未納入。實際覆審必須有這些。
-- **不做產業景氣分析**：無總體經濟變數、無產業週期判斷。Altman Z 只能告訴你「以歷史財報看，這家公司 stress 程度」，看不到「下一個半導體景氣下行週期」。
-- **異常偵測的母體小**：5 年 35 個樣本，統計顯著性有限。應作為**警示系統**而非**判斷系統**。
-
----
-
-## 7. 後續延伸方向 
-
-1. 接 MOPS 真實 API，每季自動更新
-2. 加入產業景氣領先指標（半導體：BB ratio、零售：消費者信心指數）
-3. 風險評分模型從規則式改成監督式學習（需歷史違約資料）
-4. Dashboard 加上 alert email 推播
-5. 與聯徵 / 銀行內部信用評等系統打通
-
----
-
-## 8. 致謝與資料來源
-
-- 模擬資料：基於公開財報的 plausible 產生器，非真實數據
-- 財務比率公式：CFA Curriculum 2024、台灣財務分析教科書（柯承恩等）
-- Altman Z' 修正版：Altman, E.I. (1983, 2000)，台灣修正版參考張大成 (2003)
-- LLM API：Anthropic Claude API（demo 階段；實際導入需資安評估）
+```text
+This project demonstrates how Python, financial risk logic, and Tableau can be combined into an AI-assisted credit review workflow that helps analysts identify portfolio risk while keeping final decisions human-reviewed.
+```

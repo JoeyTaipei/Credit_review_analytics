@@ -8,19 +8,56 @@ __pycache__/
 *.pyc
 *.pyo
 
-# Generated outputs — reviewer 自己跑 pipeline 就會產生
-outputs/
+# Generated outputs — 大部分輸出不推
+outputs/*
+!outputs/dashboard_credit_review.csv
+
+# Logs
+logs/
+*.log
 
 # OS files
 Thumbs.db
 desktop.ini
 .DS_Store
 
-# Cursor / VS Code settings (個人喜好，不推)
+# Cursor / VS Code settings
 .cursor/
 .vscode/
 
-# API keys — 萬一你之後把 key 寫在本地檔案
+# API keys
+.env
+*.env
+
+# Zip 包
+*.zip# Virtual environment — 絕對不要推
+.venv/
+venv/
+env/
+
+# Python compiled files
+__pycache__/
+*.pyc
+*.pyo
+
+# Generated outputs — 大部分輸出不推
+outputs/*
+!outputs/dashboard_credit_review.csv
+
+# Logs
+logs/
+*.log
+
+# OS files
+Thumbs.db
+desktop.ini
+.DS_Store
+
+# Cursor / VS Code settings
+.cursor/
+.vscode/
+
+# API keys
 .env
 *.env
 
