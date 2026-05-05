@@ -13,9 +13,9 @@ This project is an end-to-end analytics workflow that simulates how a financial 
 
 ## Dashboard Preview
 
-> Add your Tableau dashboard screenshot here after saving it as `docs/dashboard_preview.png`.
+> Add your Tableau dashboard screenshot here after saving it as `docs/Dashboard_preview.png`.
 
-![Dashboard Preview](docs/dashboard_preview.png)
+![Dashboard Preview](docs/Dashboard_preview.png)
 
 ---
 
